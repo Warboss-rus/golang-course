@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	str := "";
+	str := ""
 	for i := 1; i < 100; i++ {
 		if i%15 == 0 {
 			str += "Fizz Buzz"

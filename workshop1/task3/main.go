@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"image/color"
+	"time"
+)
 
 type FlyingBehavior interface {
 	Fly() string
@@ -44,42 +48,65 @@ type Duck struct {
 	quack  QuackBehavior
 }
 
+type NormalDuck struct {
+	Duck
+	color color.Color
+}
+
+type RoboDuck struct {
+	Duck
+	id string
+}
+
+type DeadDuck struct {
+	Duck
+	timeOfDeath time.Time
+}
+
 type IDuck interface {
 	Name() string
 	Fly() string
 	Quack() string
 }
 
-func (duck Duck) Fly() string {
+func (duck *Duck) Fly() string {
 	return duck.flying.Fly()
 }
 
-func (duck Duck) Quack() string {
+func (duck *Duck) Quack() string {
 	return duck.quack()
 }
 
-func (duck Duck) Name() string {
+func (duck *Duck) Name() string {
 	return duck.name
 }
 
-func NewDuck(name string, flying FlyingBehavior, quack func() string) IDuck {
-	return Duck{name, flying, quack}
+func NewNormalDuck(color color.Color) *NormalDuck {
+	return &NormalDuck{Duck{"Normal duck", WingFlying{}, NormalQuack}, color}
 }
 
-func NewNormalDuck() IDuck {
-	return NewDuck("Normal duck", WingFlying{}, NormalQuack)
+func NewRoboDuck(id string) *RoboDuck {
+	return &RoboDuck{Duck{"Robo-duck", JetFlying{}, RoboQuack}, id}
 }
 
-func NewRoboDuck() IDuck {
-	return NewDuck("Robo-duck", JetFlying{}, RoboQuack)
+func NewDeadDuck(timeOfDeath time.Time) *DeadDuck {
+	return &DeadDuck{Duck{"Dead duck", NoFlying{}, NoQuack}, timeOfDeath}
 }
 
-func NewDeadDuck() IDuck {
-	return NewDuck("Dead duck", NoFlying{}, NoQuack)
+func Details(duck IDuck) string {
+	switch d := duck.(type) {
+	case *NormalDuck:
+		return fmt.Sprint("has a color of ", d.color)
+	case *RoboDuck:
+		return fmt.Sprint("has an id of ", d.id)
+	case *DeadDuck:
+		return fmt.Sprint("diead at ", d.timeOfDeath)
+	}
+	return ""
 }
 
 func PrintDuck(duck IDuck) {
-	fmt.Printf("Duck by the name of %q %v and tells you %q\n", duck.Name(), duck.Fly(), duck.Quack())
+	fmt.Printf("Duck by the name of %q %v, tells you %q and %v\n", duck.Name(), duck.Fly(), duck.Quack(), Details(duck))
 }
 
 func PlayWithDuck(duck IDuck) {
@@ -95,9 +122,9 @@ func PlayWithDuck(duck IDuck) {
 
 func main() {
 	ducks := []IDuck{
-		NewNormalDuck(),
-		NewRoboDuck(),
-		NewDeadDuck(),
+		NewNormalDuck(color.White),
+		NewRoboDuck("42373216assdf5632476"),
+		NewDeadDuck(time.Now()),
 	}
 	for _, duck := range ducks {
 		PrintDuck(duck)
