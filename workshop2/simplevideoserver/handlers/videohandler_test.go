@@ -42,4 +42,14 @@ func TestHandleVideo(t *testing.T) {
 	if video != v {
 		t.Error("Invalid video received")
 	}
+
+	videoId = "invalid"
+	request = httptest.NewRequest(http.MethodGet, "/video/"+videoId, nil)
+	request = mux.SetURLVars(request, map[string]string{"ID": videoId})
+	recorder = httptest.NewRecorder()
+	handleVideo(recorder, request)
+	response = recorder.Result()
+	if response.StatusCode != http.StatusInternalServerError {
+		t.Errorf("Status code is wrong. Have: %d, want: %d.", response.StatusCode, http.StatusInternalServerError)
+	}
 }
