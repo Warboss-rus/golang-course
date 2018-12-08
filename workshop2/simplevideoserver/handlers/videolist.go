@@ -32,5 +32,5 @@ func findVideoById(id string) (Video, error) {
 			return v, nil
 		}
 	}
-	return Video{"", "", 0, "", ""}, errors.New("Invalid video requested. Id=" + id)
+	return Video{}, errors.New("Invalid video requested. Id=" + id)
 }
