@@ -13,3 +13,5 @@
 .idea
 /workshop2/simplevideoserver/content
 /workshop2/simplevideoserver/index.html
+/vendor
+/my.log
