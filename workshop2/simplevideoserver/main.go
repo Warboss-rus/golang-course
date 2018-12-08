@@ -51,5 +51,5 @@ func main() {
 	srv := startServer(serverUrl)
 
 	waitForKillSignal(killSignalChan)
-	_ = srv.Shutdown(context.Background())
+	log.Fatal(srv.Shutdown(context.Background()))
 }
