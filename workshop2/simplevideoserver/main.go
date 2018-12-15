@@ -11,7 +11,8 @@ import (
 )
 
 func startServer(serverUrl string, db *handlers.DataBaseConnector) *http.Server {
-	router := handlers.Router(db)
+	var fs handlers.FileSystemHandler
+	router := handlers.Router(db, &fs)
 	srv := &http.Server{Addr: serverUrl, Handler: router}
 	go func() {
 		log.Fatal(srv.ListenAndServe())

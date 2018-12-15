@@ -3,16 +3,25 @@ package handlers
 import (
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
+type MockFilesHandler struct {
+}
+
+func (fs *MockFilesHandler) CreateFile(id string, filename string, content io.Reader) error {
+	return nil
+}
+
 func TestRouter(t *testing.T) {
 	log.SetOutput(ioutil.Discard)
 	videoConnector := NewMockVideosConnector()
-	r := Router(&videoConnector)
+	var fs MockFilesHandler
+	r := Router(&videoConnector, &fs)
 
 	request, err := http.NewRequest(http.MethodGet, "/api/v1/list", nil)
 	if err != nil {

@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func handleList(w http.ResponseWriter, _ *http.Request, db VideosConnector) {
+func handleList(w http.ResponseWriter, _ *http.Request, db VideosRepository) {
 	videos, err := db.GetVideoList()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
