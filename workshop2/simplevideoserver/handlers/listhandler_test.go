@@ -10,7 +10,8 @@ import (
 
 func TestHandleList(t *testing.T) {
 	recorder := httptest.NewRecorder()
-	handleList(recorder, nil)
+	videoConnector := NewMockVideosConnector()
+	handleList(recorder, nil, &videoConnector)
 	response := recorder.Result()
 	if response.StatusCode != http.StatusOK {
 		t.Errorf("Status code is wrong. Have: %d, want: %d.", response.StatusCode, http.StatusOK)
@@ -28,11 +29,11 @@ func TestHandleList(t *testing.T) {
 	if err = json.Unmarshal(jsonString, &items); err != nil {
 		t.Errorf("Can't parse json response with error %v", err)
 	}
-	if len(items) != len(videos) {
+	if len(items) != len(videoConnector.videos) {
 		t.Error("Invalid number of videos received")
 	}
 	for _, v := range items {
-		video, err := findVideoById(v.Id)
+		video, err := videoConnector.GetVideoDetails(v.Id)
 		if err != nil {
 			t.Fatal(err)
 		}

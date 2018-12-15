@@ -8,10 +8,10 @@ import (
 	"net/http"
 )
 
-func handleVideo(w http.ResponseWriter, r *http.Request) {
+func handleVideo(w http.ResponseWriter, r *http.Request, db VideosConnector) {
 	vars := mux.Vars(r)
 	id := vars["ID"]
-	video, err := findVideoById(id)
+	video, err := db.GetVideoDetails(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

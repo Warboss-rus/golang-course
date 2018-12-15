@@ -7,7 +7,12 @@ import (
 	"net/http"
 )
 
-func handleList(w http.ResponseWriter, _ *http.Request) {
+func handleList(w http.ResponseWriter, _ *http.Request, db VideosConnector) {
+	videos, err := db.GetVideoList()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	jsonContent, err := json.Marshal(videos)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

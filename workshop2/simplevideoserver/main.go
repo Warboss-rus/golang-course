@@ -10,8 +10,8 @@ import (
 	"syscall"
 )
 
-func startServer(serverUrl string) *http.Server {
-	router := handlers.Router()
+func startServer(serverUrl string, db *handlers.DataBaseConnector) *http.Server {
+	router := handlers.Router(db)
 	srv := &http.Server{Addr: serverUrl, Handler: router}
 	go func() {
 		log.Fatal(srv.ListenAndServe())
@@ -47,8 +47,12 @@ func main() {
 	const serverUrl = ":8000"
 	log.WithFields(log.Fields{"url": serverUrl}).Info("starting the server")
 
+	var db handlers.DataBaseConnector
+	db.Connect()
+	defer db.Close()
+
 	killSignalChan := getKillSignalChan()
-	srv := startServer(serverUrl)
+	srv := startServer(serverUrl, &db)
 
 	waitForKillSignal(killSignalChan)
 	log.Fatal(srv.Shutdown(context.Background()))

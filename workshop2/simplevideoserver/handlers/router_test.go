@@ -11,7 +11,8 @@ import (
 
 func TestRouter(t *testing.T) {
 	log.SetOutput(ioutil.Discard)
-	r := Router()
+	videoConnector := NewMockVideosConnector()
+	r := Router(&videoConnector)
 
 	request, err := http.NewRequest(http.MethodGet, "/api/v1/list", nil)
 	if err != nil {
@@ -26,13 +27,13 @@ func TestRouter(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	expected, _ := json.Marshal(videos)
+	expected, _ := json.Marshal(videoConnector.videos)
 	if recorder.Body.String() != string(expected) {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			recorder.Body.String(), expected)
 	}
 
-	var videoId = videos[0].Id
+	var videoId = videoConnector.videos[0].Id
 	request, err = http.NewRequest(http.MethodGet, "/api/v1/video/"+videoId, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -46,7 +47,7 @@ func TestRouter(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	expected, _ = json.Marshal(videos[0])
+	expected, _ = json.Marshal(videoConnector.videos[0])
 	if recorder.Body.String() != string(expected) {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			recorder.Body.String(), expected)
