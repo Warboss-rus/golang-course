@@ -6,4 +6,5 @@ type Video struct {
 	Duration  int    `json:"duration"`
 	Thumbnail string `json:"thumbnail"`
 	Url       string `json:"url"`
+	Status    int    `json:"status"`
 }

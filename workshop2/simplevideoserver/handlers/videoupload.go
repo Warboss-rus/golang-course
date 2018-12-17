@@ -27,7 +27,7 @@ func handleVideoUpload(w http.ResponseWriter, r *http.Request, db VideosReposito
 		return
 	}
 
-	v := Video{id, fileName, 123, filepath.Join("content", id, "screen.jpg"), url}
+	v := Video{id, fileName, 123, filepath.Join("content", id, "screen.jpg"), url, 3}
 	err = db.AddVideo(v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

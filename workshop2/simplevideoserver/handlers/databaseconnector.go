@@ -71,14 +71,14 @@ func (conn *DataBaseConnector) GetVideoList() ([]Video, error) {
 		return nil, errors.New("database is not connected")
 	}
 	var videos []Video
-	rows, err := conn.db.Query(`SELECT video_key, title, duration, url, thumbnail_url FROM video`)
+	rows, err := conn.db.Query(`SELECT video_key, title, duration, url, thumbnail_url, status FROM video`)
 	if err != nil {
 		return videos, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var video Video
-		err := rows.Scan(&video.Id, &video.Name, &video.Duration, &video.Url, &video.Thumbnail)
+		err := rows.Scan(&video.Id, &video.Name, &video.Duration, &video.Url, &video.Thumbnail, &video.Status)
 		if err != nil {
 			return videos, err
 		}
@@ -92,8 +92,8 @@ func (conn *DataBaseConnector) GetVideoDetails(videoId string) (Video, error) {
 		return Video{}, errors.New("database is not connected")
 	}
 	var video Video
-	row := conn.db.QueryRow(`SELECT video_key, title, duration, url, thumbnail_url FROM video WHERE video_key = ?`, videoId)
-	err := row.Scan(&video.Id, &video.Name, &video.Duration, &video.Url, &video.Thumbnail)
+	row := conn.db.QueryRow(`SELECT video_key, title, duration, url, thumbnail_url, status FROM video WHERE video_key = ?`, videoId)
+	err := row.Scan(&video.Id, &video.Name, &video.Duration, &video.Url, &video.Thumbnail, &video.Status)
 	return video, err
 }
 
@@ -101,8 +101,8 @@ func (conn *DataBaseConnector) AddVideo(video Video) error {
 	if conn.db == nil {
 		return errors.New("database is not connected")
 	}
-	q := `INSERT INTO video SET video_key = ?, title = ?, duration = ?, url = ?, thumbnail_url  = ?`
-	_, err := conn.db.Exec(q, video.Id, video.Name, video.Duration, video.Url, video.Thumbnail)
+	q := `INSERT INTO video SET video_key = ?, title = ?, duration = ?, url = ?, thumbnail_url  = ?, status = ?`
+	_, err := conn.db.Exec(q, video.Id, video.Name, video.Duration, video.Url, video.Thumbnail, video.Status)
 	return err
 }
 
