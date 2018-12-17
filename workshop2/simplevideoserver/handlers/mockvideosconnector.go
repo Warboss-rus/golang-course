@@ -3,17 +3,18 @@ package handlers
 import "errors"
 
 type MockVideoConnector struct {
-	videos []Video
+	videos        []Video
+	errorToReturn error
 }
 
 func (connector *MockVideoConnector) GetVideoList() ([]Video, error) {
-	return connector.videos, nil
+	return connector.videos, connector.errorToReturn
 }
 
 func (connector *MockVideoConnector) GetVideoDetails(videoId string) (Video, error) {
 	for _, v := range connector.videos {
 		if v.Id == videoId {
-			return v, nil
+			return v, connector.errorToReturn
 		}
 	}
 	return Video{}, errors.New("Invalid video requested. Id=" + videoId)
@@ -21,7 +22,7 @@ func (connector *MockVideoConnector) GetVideoDetails(videoId string) (Video, err
 
 func (connector *MockVideoConnector) AddVideo(video Video) error {
 	connector.videos = append(connector.videos, video)
-	return nil
+	return connector.errorToReturn
 }
 
 func NewMockVideosConnector() MockVideoConnector {

@@ -9,20 +9,20 @@ import (
 type FileSystemHandler struct {
 }
 
-func (fs *FileSystemHandler) CreateFile(id string, filename string, content io.Reader) error {
+func (fs *FileSystemHandler) CreateFile(id string, filename string, content io.Reader) (string, error) {
 	const environmentDir = "C:\\Users\\Warboss-rus\\go\\src\\github.com\\Warboss-rus\\golang-course"
 	const videoDir = "workshop2\\simplevideoserver\\content"
 	dir := filepath.Join(environmentDir, videoDir, id)
 	file, err := createFile(filename, dir)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer file.Close()
 	_, err = io.Copy(file, content)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return filepath.Join("content", id, filename), nil
 }
 
 func createFile(fileName string, dirPath string) (*os.File, error) {

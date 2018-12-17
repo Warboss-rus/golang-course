@@ -21,13 +21,13 @@ func handleVideoUpload(w http.ResponseWriter, r *http.Request, db VideosReposito
 
 	id := uuid.New().String()
 	fileName := header.Filename
-	err = fs.CreateFile(id, fileName, fileReader)
+	url, err := fs.CreateFile(id, fileName, fileReader)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	v := Video{id, fileName, 123, filepath.Join("content", id, "screen.jpg"), filepath.Join("content", id, fileName)}
+	v := Video{id, fileName, 123, filepath.Join("content", id, "screen.jpg"), url}
 	err = db.AddVideo(v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
