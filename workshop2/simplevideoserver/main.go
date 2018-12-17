@@ -49,7 +49,9 @@ func main() {
 	log.WithFields(log.Fields{"url": serverUrl}).Info("starting the server")
 
 	var db handlers.DataBaseConnector
-	db.Connect()
+	if err := db.Connect(); err != nil {
+		log.Fatal(err)
+	}
 	defer db.Close()
 
 	killSignalChan := getKillSignalChan()

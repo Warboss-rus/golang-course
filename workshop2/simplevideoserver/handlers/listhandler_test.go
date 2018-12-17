@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -10,8 +11,8 @@ import (
 
 func TestHandleList(t *testing.T) {
 	recorder := httptest.NewRecorder()
-	videoConnector := NewMockVideosConnector()
-	handleList(recorder, nil, &videoConnector)
+	videoRepository := NewMockVideosConnector()
+	handleList(recorder, nil, &videoRepository)
 	response := recorder.Result()
 	if response.StatusCode != http.StatusOK {
 		t.Errorf("Status code is wrong. Have: %d, want: %d.", response.StatusCode, http.StatusOK)
@@ -29,16 +30,26 @@ func TestHandleList(t *testing.T) {
 	if err = json.Unmarshal(jsonString, &items); err != nil {
 		t.Errorf("Can't parse json response with error %v", err)
 	}
-	if len(items) != len(videoConnector.videos) {
+	if len(items) != len(videoRepository.videos) {
 		t.Error("Invalid number of videos received")
 	}
 	for _, v := range items {
-		video, err := videoConnector.GetVideoDetails(v.Id)
+		video, err := videoRepository.GetVideoDetails(v.Id)
 		if err != nil {
 			t.Fatal(err)
 		}
 		if video != v {
 			t.Error("Invalid video received")
 		}
+	}
+
+	// bd error test
+	videoRepository.errorToReturn = errors.New("bd error")
+	recorder = httptest.NewRecorder()
+	handleList(recorder, nil, &videoRepository)
+	response = recorder.Result()
+	videoRepository.errorToReturn = nil
+	if response.StatusCode != http.StatusInternalServerError {
+		t.Errorf("Status code is wrong. Have: %d, want: %d.", response.StatusCode, http.StatusOK)
 	}
 }
