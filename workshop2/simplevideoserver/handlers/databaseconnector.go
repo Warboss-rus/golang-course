@@ -106,6 +106,16 @@ func (conn *DataBaseConnector) AddVideo(video Video) error {
 	return err
 }
 
+func (conn *DataBaseConnector) GetVideoStatus(videoId string) (Status, error) {
+	if conn.db == nil {
+		return Error, errors.New("database is not connected")
+	}
+	var status Status
+	row := conn.db.QueryRow(`SELECT status FROM video WHERE video_key = ?`, videoId)
+	err := row.Scan(&status)
+	return status, err
+}
+
 func (conn *DataBaseConnector) Close() error {
 	if conn.db != nil {
 		return conn.db.Close()

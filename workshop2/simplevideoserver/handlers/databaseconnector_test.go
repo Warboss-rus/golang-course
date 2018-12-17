@@ -52,5 +52,12 @@ func TestDataBaseConnector(t *testing.T) {
 				t.Error("Invalid video received")
 			}
 		}
+
+		for _, v := range videoList.videos {
+			status, err := db.GetVideoStatus(v.Id)
+			if err != nil || status != v.Status {
+				t.Error("Invalid status received")
+			}
+		}
 	}
 }

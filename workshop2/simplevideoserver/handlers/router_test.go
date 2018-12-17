@@ -71,4 +71,25 @@ func TestRouter(t *testing.T) {
 	if len(videoConnector.videos) != 4 {
 		t.Error("handler should add a new video to the list")
 	}
+
+	// video status test
+	request, err = http.NewRequest(http.MethodGet, "/api/v1/video/"+videoId+"/status", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder = httptest.NewRecorder()
+
+	r.ServeHTTP(recorder, request)
+
+	if status := recorder.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	sstruct := statusStruct{videoConnector.videos[0].Status}
+	expected, _ = json.Marshal(sstruct)
+	if recorder.Body.String() != string(expected) {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			recorder.Body.String(), expected)
+	}
 }
