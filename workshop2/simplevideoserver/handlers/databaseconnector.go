@@ -12,7 +12,7 @@ type DataBaseConnector struct {
 
 func (conn *DataBaseConnector) Connect() error {
 	if conn.db != nil {
-		return errors.New("Database is already connected")
+		return errors.New("database is already connected")
 	}
 	const user = "root"
 	const password = "root"
@@ -32,7 +32,7 @@ func (conn *DataBaseConnector) Connect() error {
 
 func (conn *DataBaseConnector) ConnectTestDatabase() error {
 	if conn.db != nil {
-		return errors.New("Database is already connected")
+		return errors.New("database is already connected")
 	}
 	const user = "root"
 	const password = "root"
@@ -68,7 +68,7 @@ func (conn *DataBaseConnector) ConnectTestDatabase() error {
 
 func (conn *DataBaseConnector) GetVideoList() ([]Video, error) {
 	if conn.db == nil {
-		return nil, errors.New("Database is not connected")
+		return nil, errors.New("database is not connected")
 	}
 	var videos []Video
 	rows, err := conn.db.Query(`SELECT video_key, title, duration, url, thumbnail_url FROM video`)
@@ -89,7 +89,7 @@ func (conn *DataBaseConnector) GetVideoList() ([]Video, error) {
 
 func (conn *DataBaseConnector) GetVideoDetails(videoId string) (Video, error) {
 	if conn.db == nil {
-		return Video{}, errors.New("Database is not connected")
+		return Video{}, errors.New("database is not connected")
 	}
 	var video Video
 	row := conn.db.QueryRow(`SELECT video_key, title, duration, url, thumbnail_url FROM video WHERE video_key = ?`, videoId)
@@ -99,7 +99,7 @@ func (conn *DataBaseConnector) GetVideoDetails(videoId string) (Video, error) {
 
 func (conn *DataBaseConnector) AddVideo(video Video) error {
 	if conn.db == nil {
-		return errors.New("Database is not connected")
+		return errors.New("database is not connected")
 	}
 	q := `INSERT INTO video SET video_key = ?, title = ?, duration = ?, url = ?, thumbnail_url  = ?`
 	_, err := conn.db.Exec(q, video.Id, video.Name, video.Duration, video.Url, video.Thumbnail)
@@ -115,7 +115,7 @@ func (conn *DataBaseConnector) Close() error {
 
 func (conn *DataBaseConnector) ClearVideos() error {
 	if conn.db == nil {
-		return errors.New("Database is not connected")
+		return errors.New("database is not connected")
 	}
 	_, err := conn.db.Exec("DROP TABLE IF EXISTS video")
 	return err
