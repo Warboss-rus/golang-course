@@ -17,7 +17,11 @@ func handleStatus(w http.ResponseWriter, r *http.Request, db VideosRepository) {
 	id := vars["ID"]
 	status, err := db.GetVideoStatus(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		if _, ok := err.(*VideoNotFound); !ok {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 	sStruct := statusStruct{status}

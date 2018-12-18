@@ -50,7 +50,7 @@ func TestHandleVideo(t *testing.T) {
 	recorder = httptest.NewRecorder()
 	handleVideo(recorder, request, &videoConnector)
 	response = recorder.Result()
-	if response.StatusCode != http.StatusInternalServerError {
-		t.Errorf("Status code is wrong. Have: %d, want: %d.", response.StatusCode, http.StatusInternalServerError)
+	if response.StatusCode != http.StatusBadRequest {
+		t.Errorf("Status code is wrong. Have: %d, want: %d.", response.StatusCode, http.StatusBadRequest)
 	}
 }

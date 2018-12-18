@@ -83,5 +83,17 @@ func TestDataBaseConnector(t *testing.T) {
 		if videos[0] != videoList.videos[2] {
 			t.Error("Invalid video received")
 		}
+
+		// invalid id test
+		var invalidId = "invalid"
+		_, err = db.GetVideoDetails(invalidId)
+		if _, ok := err.(*VideoNotFound); !ok {
+			t.Error("VideoNotFound error expected")
+		}
+
+		_, err = db.GetVideoStatus(invalidId)
+		if _, ok := err.(*VideoNotFound); !ok {
+			t.Error("VideoNotFound error expected")
+		}
 	}
 }

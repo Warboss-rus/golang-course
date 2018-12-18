@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -9,20 +10,33 @@ import (
 	"strconv"
 )
 
-func optionalIntParam(params url.Values, name string) *uint {
+func optionalIntParam(params url.Values, name string, max int) (*uint, error) {
 	if skip := params.Get(name); len(skip) != 0 {
 		if val, err := strconv.Atoi(skip); err == nil {
+			if val < 0 || ((max >= 0) && (val > max)) {
+				return nil, errors.New("bad input parameter")
+			}
 			uval := uint(val)
-			return &uval
+			return &uval, nil
+		} else {
+			return nil, err
 		}
 	}
-	return nil
+	return nil, nil
 }
 
 func handleList(w http.ResponseWriter, r *http.Request, db VideosRepository) {
 	params := r.URL.Query()
-	start := optionalIntParam(params, "skip")
-	count := optionalIntParam(params, "limit")
+	start, err := optionalIntParam(params, "skip", -1)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	count, err := optionalIntParam(params, "limit", 50)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	search := params.Get("searchString")
 
 	videos, err := db.GetVideoList(search, start, count)

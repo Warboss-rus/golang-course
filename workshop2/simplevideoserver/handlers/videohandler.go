@@ -13,7 +13,11 @@ func handleVideo(w http.ResponseWriter, r *http.Request, db VideosRepository) {
 	id := vars["ID"]
 	video, err := db.GetVideoDetails(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if _, ok := err.(*VideoNotFound); !ok {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 	jsonContent, err := json.Marshal(video)

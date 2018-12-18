@@ -109,6 +109,9 @@ func (conn *DataBaseConnector) GetVideoDetails(videoId string) (Video, error) {
 	var video Video
 	row := conn.db.QueryRow(`SELECT video_key, title, duration, url, thumbnail_url, status FROM video WHERE video_key = ?`, videoId)
 	err := row.Scan(&video.Id, &video.Name, &video.Duration, &video.Url, &video.Thumbnail, &video.Status)
+	if err == sql.ErrNoRows {
+		return video, &VideoNotFound{}
+	}
 	return video, err
 }
 
@@ -128,6 +131,9 @@ func (conn *DataBaseConnector) GetVideoStatus(videoId string) (Status, error) {
 	var status Status
 	row := conn.db.QueryRow(`SELECT status FROM video WHERE video_key = ?`, videoId)
 	err := row.Scan(&status)
+	if err == sql.ErrNoRows {
+		return Error, &VideoNotFound{}
+	}
 	return status, err
 }
 

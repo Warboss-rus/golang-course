@@ -107,4 +107,22 @@ func TestHandleList(t *testing.T) {
 	if items[0] != videoRepository.videos[1] {
 		t.Error("Invalid video received")
 	}
+
+	// invalid skip
+	recorder = httptest.NewRecorder()
+	request = httptest.NewRequest(http.MethodGet, "/video?skip=-1", nil)
+	handleList(recorder, request, &videoRepository)
+	response = recorder.Result()
+	if response.StatusCode != http.StatusBadRequest {
+		t.Errorf("Status code is wrong. Have: %d, want: %d.", response.StatusCode, http.StatusBadRequest)
+	}
+
+	// invalid limit
+	recorder = httptest.NewRecorder()
+	request = httptest.NewRequest(http.MethodGet, "/video?limit=51", nil)
+	handleList(recorder, request, &videoRepository)
+	response = recorder.Result()
+	if response.StatusCode != http.StatusBadRequest {
+		t.Errorf("Status code is wrong. Have: %d, want: %d.", response.StatusCode, http.StatusBadRequest)
+	}
 }
