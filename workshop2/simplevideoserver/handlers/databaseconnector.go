@@ -66,12 +66,27 @@ func (conn *DataBaseConnector) ConnectTestDatabase() error {
 	return err
 }
 
-func (conn *DataBaseConnector) GetVideoList() ([]Video, error) {
+func (conn *DataBaseConnector) GetVideoList(search string, start *uint, count *uint) ([]Video, error) {
 	if conn.db == nil {
 		return nil, errors.New("database is not connected")
 	}
 	var videos []Video
-	rows, err := conn.db.Query(`SELECT video_key, title, duration, url, thumbnail_url, status FROM video`)
+	query := `SELECT video_key, title, duration, url, thumbnail_url, status FROM video ORDER BY id`
+	var args []interface{}
+	if len(search) > 0 {
+		query += ` WHERE title LIKE '%?%'`
+		args = append(args, search)
+	}
+	if count != nil {
+		query += ` LIMIT ?`
+		args = append(args, *count)
+	}
+	if start != nil {
+		query += ` OFFSET ?`
+		args = append(args, *start)
+	}
+
+	rows, err := conn.db.Query(query, args...)
 	if err != nil {
 		return videos, err
 	}

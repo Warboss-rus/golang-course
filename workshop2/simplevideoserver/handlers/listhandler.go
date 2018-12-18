@@ -5,10 +5,27 @@ import (
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+	"net/url"
+	"strconv"
 )
 
-func handleList(w http.ResponseWriter, _ *http.Request, db VideosRepository) {
-	videos, err := db.GetVideoList()
+func optionalIntParam(params url.Values, name string) *uint {
+	if skip := params.Get(name); len(skip) != 0 {
+		if val, err := strconv.Atoi(skip); err == nil {
+			uval := uint(val)
+			return &uval
+		}
+	}
+	return nil
+}
+
+func handleList(w http.ResponseWriter, r *http.Request, db VideosRepository) {
+	params := r.URL.Query()
+	start := optionalIntParam(params, "skip")
+	count := optionalIntParam(params, "limit")
+	search := params.Get("searchString")
+
+	videos, err := db.GetVideoList(search, start, count)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

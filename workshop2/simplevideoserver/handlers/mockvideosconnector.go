@@ -1,14 +1,33 @@
 package handlers
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 type MockVideoConnector struct {
 	videos        []Video
 	errorToReturn error
 }
 
-func (connector *MockVideoConnector) GetVideoList() ([]Video, error) {
-	return connector.videos, connector.errorToReturn
+func (connector *MockVideoConnector) GetVideoList(search string, start *uint, count *uint) ([]Video, error) {
+	videos := connector.videos
+	if len(search) != 0 {
+		filtered := []Video{}
+		for _, v := range videos {
+			if strings.Contains(v.Name, search) {
+				filtered = append(filtered, v)
+			}
+		}
+		videos = filtered
+	}
+	if start != nil {
+		videos = videos[*start:]
+	}
+	if count != nil {
+		videos = videos[:*count]
+	}
+	return videos, connector.errorToReturn
 }
 
 func (connector *MockVideoConnector) GetVideoDetails(videoId string) (Video, error) {
