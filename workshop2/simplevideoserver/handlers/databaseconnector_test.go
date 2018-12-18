@@ -59,7 +59,7 @@ func TestDataBaseConnector(t *testing.T) {
 		}
 
 		//search test
-		/*videos, err = db.GetVideoList("Rally", nil, nil)
+		videos, err = db.GetVideoList("Rally", nil, nil)
 		if err != nil {
 			t.Error("Getting list of videos failed with: ", err)
 		}
@@ -68,7 +68,7 @@ func TestDataBaseConnector(t *testing.T) {
 		}
 		if videos[0] != videoList.videos[1] {
 			t.Error("Invalid video received")
-		}*/
+		}
 
 		// skip and limit test
 		var start uint = 2

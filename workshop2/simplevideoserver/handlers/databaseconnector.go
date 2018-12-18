@@ -71,11 +71,11 @@ func (conn *DataBaseConnector) GetVideoList(search string, start *uint, count *u
 		return nil, errors.New("database is not connected")
 	}
 	var videos []Video
-	query := `SELECT video_key, title, duration, url, thumbnail_url, status FROM video ORDER BY id`
+	query := `SELECT video_key, title, duration, url, thumbnail_url, status FROM video`
 	var args []interface{}
 	if len(search) > 0 {
-		query += ` WHERE title LIKE '%?%'`
-		args = append(args, search)
+		query += ` WHERE title LIKE ?`
+		args = append(args, "%"+search+"%")
 	}
 	if count != nil {
 		query += ` LIMIT ?`
