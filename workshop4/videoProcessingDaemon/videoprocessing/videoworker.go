@@ -2,20 +2,18 @@ package videoprocessing
 
 import (
 	log "github.com/sirupsen/logrus"
-	"os"
 	"path/filepath"
 )
 
-func RunWorker(videosChan <-chan Video, repository VideoRepository, processor VideoProcessor, name int) {
+func RunWorker(videosChan <-chan Video, repository VideoRepository, processor VideoProcessor, contentPath string, name int) {
 	log.Printf("start worker %v\n", name)
 	for video := range videosChan {
 		log.Printf("start processing video %s on %v\n", video.Id, name)
 		if err := repository.UpdateVideoStatus(video.Id, Processing); err != nil {
 			log.Printf("Cannot update status of video %s", video.Id)
 		}
-		const pathToContent = "workshop2\\simplevideoserver"
-		workDir, err := os.Getwd()
-		pathToVideoFile := filepath.Join(workDir, pathToContent, video.Url)
+
+		pathToVideoFile := filepath.Join(contentPath, video.Url)
 		duration, err := processor.GetVideoDuration(pathToVideoFile)
 		if err != nil {
 			log.Printf("Failed to calculate video duration of %s", video.Url)
@@ -25,7 +23,7 @@ func RunWorker(videosChan <-chan Video, repository VideoRepository, processor Vi
 			continue
 		}
 		thumbnailUrl := filepath.Join("content", video.Id, "screen.jpg")
-		thumbnailPath := filepath.Join(workDir, pathToContent, thumbnailUrl)
+		thumbnailPath := filepath.Join(contentPath, thumbnailUrl)
 		var thumbnailOffset int64
 		if err = processor.CreateVideoThumbnail(pathToVideoFile, thumbnailPath, thumbnailOffset); err != nil {
 			log.Printf("Failed to generate thumbnail for %s", video.Url)

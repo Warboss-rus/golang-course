@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/database"
 	"github.com/Warboss-rus/golang-course/workshop4/videoProcessingDaemon/ffmpeg"
 	"github.com/Warboss-rus/golang-course/workshop4/videoProcessingDaemon/videoprocessing"
@@ -34,8 +35,15 @@ func main() {
 		defer file.Close()
 	}
 
+	const defaultContentDir = "workshop2\\simplevideoserver"
+	contentDir := flag.String("-dir", defaultContentDir, "Specify a directory to store the videos")
+	user := flag.String("-user", "root", "Specify a user for database access")
+	password := flag.String("-password", "root", "Specify a password for database access")
+	dbname := flag.String("-database", "db1", "Specify a database name for database access")
+	flag.Parse()
+
 	var db database.DataBaseVideoRepository
-	if err := db.Connect(); err != nil {
+	if err := db.Connect(*dbname, *user, *password); err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
@@ -44,7 +52,7 @@ func main() {
 	stopChan := make(chan struct{})
 	processor := ffmpeg.FfmpegVideoProcessor{}
 	videosChan := videoprocessing.WatchVideos(stopChan, &db)
-	wg := videoprocessing.RunWorkerPool(videosChan, &db, &processor)
+	wg := videoprocessing.RunWorkerPool(videosChan, &db, &processor, *contentDir)
 
 	waitForKillSignal(killSignalChan)
 	stopChan <- struct{}{}

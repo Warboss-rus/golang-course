@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 )
 
@@ -51,7 +52,8 @@ func main() {
 	log.WithFields(log.Fields{"url": serverUrl}).Info("starting the server")
 
 	const defaultContentDir = "workshop2\\simplevideoserver\\content"
-	contentDir := flag.String("-dir", defaultContentDir, "Specify a directory to store the videos")
+	workDir, _ := os.Getwd()
+	contentDir := flag.String("-dir", filepath.Join(workDir, defaultContentDir), "Specify a directory to store the videos")
 	user := flag.String("-user", "root", "Specify a user for database access")
 	password := flag.String("-password", "root", "Specify a password for database access")
 	dbname := flag.String("-database", "db1", "Specify a database name for database access")
