@@ -11,7 +11,7 @@ import (
 
 func TestHandleList(t *testing.T) {
 	recorder := httptest.NewRecorder()
-	videoRepository := NewMockVideosConnector()
+	videoRepository := NewMockVideoRepository()
 	request := httptest.NewRequest(http.MethodGet, "/list", nil)
 	handleList(recorder, request, &videoRepository)
 	response := recorder.Result()

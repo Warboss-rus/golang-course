@@ -8,10 +8,10 @@ import (
 	"net/http"
 )
 
-func handleVideo(w http.ResponseWriter, r *http.Request, db VideosRepository) {
+func handleVideo(w http.ResponseWriter, r *http.Request, repository VideosRepository) {
 	vars := mux.Vars(r)
 	id := vars["ID"]
-	video, err := db.GetVideoDetails(id)
+	video, err := repository.GetVideoDetails(id)
 	if err != nil {
 		if _, ok := err.(*VideoNotFound); !ok {
 			http.Error(w, err.Error(), http.StatusBadRequest)

@@ -12,10 +12,10 @@ type statusStruct struct {
 	Status Status `json:"status"`
 }
 
-func handleStatus(w http.ResponseWriter, r *http.Request, db VideosRepository) {
+func handleStatus(w http.ResponseWriter, r *http.Request, repository VideosRepository) {
 	vars := mux.Vars(r)
 	id := vars["ID"]
-	status, err := db.GetVideoStatus(id)
+	status, err := repository.GetVideoStatus(id)
 	if err != nil {
 		if _, ok := err.(*VideoNotFound); !ok {
 			http.Error(w, err.Error(), http.StatusNotFound)

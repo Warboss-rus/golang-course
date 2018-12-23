@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/database"
 	"github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/handlers"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 	"syscall"
 )
 
-func startServer(serverUrl string, db *handlers.DataBaseConnector) *http.Server {
+func startServer(serverUrl string, db *database.DataBaseVideoRepository) *http.Server {
 	var fs handlers.FileSystemHandler
 	router := handlers.Router(db, &fs)
 	srv := &http.Server{Addr: serverUrl, Handler: router}
@@ -48,7 +49,7 @@ func main() {
 	const serverUrl = ":8000"
 	log.WithFields(log.Fields{"url": serverUrl}).Info("starting the server")
 
-	var db handlers.DataBaseConnector
+	var db database.DataBaseVideoRepository
 	if err := db.Connect(); err != nil {
 		log.Fatal(err)
 	}

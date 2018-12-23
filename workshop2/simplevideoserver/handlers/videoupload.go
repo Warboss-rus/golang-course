@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-func handleVideoUpload(w http.ResponseWriter, r *http.Request, db VideosRepository, fs FilesHandler) {
+func handleVideoUpload(w http.ResponseWriter, r *http.Request, repository VideosRepository, fs FilesHandler) {
 	fileReader, header, err := r.FormFile("file[]")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -28,7 +28,7 @@ func handleVideoUpload(w http.ResponseWriter, r *http.Request, db VideosReposito
 	}
 
 	v := Video{id, fileName, 123, filepath.Join("content", id, "screen.jpg"), url, Ready}
-	err = db.AddVideo(v)
+	err = repository.AddVideo(v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

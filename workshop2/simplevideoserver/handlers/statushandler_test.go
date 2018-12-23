@@ -10,12 +10,12 @@ import (
 )
 
 func TestStatusHandler(t *testing.T) {
-	videoConnector := NewMockVideosConnector()
-	videoId := videoConnector.videos[0].Id
+	videoRepository := NewMockVideoRepository()
+	videoId := videoRepository.videos[0].Id
 	recorder := httptest.NewRecorder()
 	request := httptest.NewRequest(http.MethodGet, "/video/"+videoId+"/status", nil)
 	request = mux.SetURLVars(request, map[string]string{"ID": videoId})
-	handleStatus(recorder, request, &videoConnector)
+	handleStatus(recorder, request, &videoRepository)
 	response := recorder.Result()
 	if response.StatusCode != http.StatusOK {
 		t.Errorf("Status code is wrong. Have: %d, want: %d.", response.StatusCode, http.StatusOK)
@@ -33,7 +33,7 @@ func TestStatusHandler(t *testing.T) {
 	if err = json.Unmarshal(jsonString, &sStruct); err != nil {
 		t.Errorf("Can't parse json response with error %v", err)
 	}
-	if sStruct.Status != videoConnector.videos[0].Status {
+	if sStruct.Status != videoRepository.videos[0].Status {
 		t.Error("Invalid status received")
 	}
 
@@ -41,7 +41,7 @@ func TestStatusHandler(t *testing.T) {
 	request = httptest.NewRequest(http.MethodGet, "/video/"+videoId+"/status", nil)
 	request = mux.SetURLVars(request, map[string]string{"ID": videoId})
 	recorder = httptest.NewRecorder()
-	handleStatus(recorder, request, &videoConnector)
+	handleStatus(recorder, request, &videoRepository)
 	response = recorder.Result()
 	if response.StatusCode != http.StatusNotFound {
 		t.Errorf("Status code is wrong. Have: %d, want: %d.", response.StatusCode, http.StatusNotFound)

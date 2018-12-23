@@ -25,7 +25,7 @@ func optionalIntParam(params url.Values, name string, max int) (*uint, error) {
 	return nil, nil
 }
 
-func handleList(w http.ResponseWriter, r *http.Request, db VideosRepository) {
+func handleList(w http.ResponseWriter, r *http.Request, repository VideosRepository) {
 	params := r.URL.Query()
 	start, err := optionalIntParam(params, "skip", -1)
 	if err != nil {
@@ -39,7 +39,7 @@ func handleList(w http.ResponseWriter, r *http.Request, db VideosRepository) {
 	}
 	search := params.Get("searchString")
 
-	videos, err := db.GetVideoList(search, start, count)
+	videos, err := repository.GetVideoList(search, start, count)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

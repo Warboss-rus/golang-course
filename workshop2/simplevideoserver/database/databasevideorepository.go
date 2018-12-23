@@ -1,17 +1,18 @@
-package handlers
+package database
 
 import (
 	"database/sql"
 	"errors"
+	. "github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/handlers"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type DataBaseConnector struct {
+type DataBaseVideoRepository struct {
 	db *sql.DB
 }
 
-func (conn *DataBaseConnector) Connect() error {
-	if conn.db != nil {
+func (repository *DataBaseVideoRepository) Connect() error {
+	if repository.db != nil {
 		return errors.New("database is already connected")
 	}
 	const user = "root"
@@ -22,7 +23,7 @@ func (conn *DataBaseConnector) Connect() error {
 	if err != nil {
 		return err
 	}
-	conn.db = db
+	repository.db = db
 
 	if err := db.Ping(); err != nil {
 		return err
@@ -30,8 +31,8 @@ func (conn *DataBaseConnector) Connect() error {
 	return nil
 }
 
-func (conn *DataBaseConnector) ConnectTestDatabase() error {
-	if conn.db != nil {
+func (repository *DataBaseVideoRepository) ConnectTestDatabase() error {
+	if repository.db != nil {
 		return errors.New("database is already connected")
 	}
 	const user = "root"
@@ -42,7 +43,7 @@ func (conn *DataBaseConnector) ConnectTestDatabase() error {
 	if err != nil {
 		return err
 	}
-	conn.db = db
+	repository.db = db
 
 	if err := db.Ping(); err != nil {
 		return err
@@ -66,8 +67,8 @@ func (conn *DataBaseConnector) ConnectTestDatabase() error {
 	return err
 }
 
-func (conn *DataBaseConnector) GetVideoList(search string, start *uint, count *uint) ([]Video, error) {
-	if conn.db == nil {
+func (repository *DataBaseVideoRepository) GetVideoList(search string, start *uint, count *uint) ([]Video, error) {
+	if repository.db == nil {
 		return nil, errors.New("database is not connected")
 	}
 	var videos []Video
@@ -86,7 +87,7 @@ func (conn *DataBaseConnector) GetVideoList(search string, start *uint, count *u
 		args = append(args, *start)
 	}
 
-	rows, err := conn.db.Query(query, args...)
+	rows, err := repository.db.Query(query, args...)
 	if err != nil {
 		return videos, err
 	}
@@ -102,12 +103,12 @@ func (conn *DataBaseConnector) GetVideoList(search string, start *uint, count *u
 	return videos, nil
 }
 
-func (conn *DataBaseConnector) GetVideoDetails(videoId string) (Video, error) {
-	if conn.db == nil {
+func (repository *DataBaseVideoRepository) GetVideoDetails(videoId string) (Video, error) {
+	if repository.db == nil {
 		return Video{}, errors.New("database is not connected")
 	}
 	var video Video
-	row := conn.db.QueryRow(`SELECT video_key, title, duration, url, thumbnail_url, status FROM video WHERE video_key = ?`, videoId)
+	row := repository.db.QueryRow(`SELECT video_key, title, duration, url, thumbnail_url, status FROM video WHERE video_key = ?`, videoId)
 	err := row.Scan(&video.Id, &video.Name, &video.Duration, &video.Url, &video.Thumbnail, &video.Status)
 	if err == sql.ErrNoRows {
 		return video, &VideoNotFound{}
@@ -115,21 +116,21 @@ func (conn *DataBaseConnector) GetVideoDetails(videoId string) (Video, error) {
 	return video, err
 }
 
-func (conn *DataBaseConnector) AddVideo(video Video) error {
-	if conn.db == nil {
+func (repository *DataBaseVideoRepository) AddVideo(video Video) error {
+	if repository.db == nil {
 		return errors.New("database is not connected")
 	}
 	q := `INSERT INTO video SET video_key = ?, title = ?, duration = ?, url = ?, thumbnail_url  = ?, status = ?`
-	_, err := conn.db.Exec(q, video.Id, video.Name, video.Duration, video.Url, video.Thumbnail, video.Status)
+	_, err := repository.db.Exec(q, video.Id, video.Name, video.Duration, video.Url, video.Thumbnail, video.Status)
 	return err
 }
 
-func (conn *DataBaseConnector) GetVideoStatus(videoId string) (Status, error) {
-	if conn.db == nil {
+func (repository *DataBaseVideoRepository) GetVideoStatus(videoId string) (Status, error) {
+	if repository.db == nil {
 		return Error, errors.New("database is not connected")
 	}
 	var status Status
-	row := conn.db.QueryRow(`SELECT status FROM video WHERE video_key = ?`, videoId)
+	row := repository.db.QueryRow(`SELECT status FROM video WHERE video_key = ?`, videoId)
 	err := row.Scan(&status)
 	if err == sql.ErrNoRows {
 		return Error, &VideoNotFound{}
@@ -137,17 +138,17 @@ func (conn *DataBaseConnector) GetVideoStatus(videoId string) (Status, error) {
 	return status, err
 }
 
-func (conn *DataBaseConnector) Close() error {
-	if conn.db != nil {
-		return conn.db.Close()
+func (repository *DataBaseVideoRepository) Close() error {
+	if repository.db != nil {
+		return repository.db.Close()
 	}
 	return nil
 }
 
-func (conn *DataBaseConnector) ClearVideos() error {
-	if conn.db == nil {
+func (repository *DataBaseVideoRepository) ClearVideos() error {
+	if repository.db == nil {
 		return errors.New("database is not connected")
 	}
-	_, err := conn.db.Exec("DROP TABLE IF EXISTS video")
+	_, err := repository.db.Exec("DROP TABLE IF EXISTS video")
 	return err
 }

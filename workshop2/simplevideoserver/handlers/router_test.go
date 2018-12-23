@@ -11,9 +11,9 @@ import (
 
 func TestRouter(t *testing.T) {
 	log.SetOutput(ioutil.Discard)
-	videoConnector := NewMockVideosConnector()
+	videoRepository := NewMockVideoRepository()
 	var fs MockFilesHandler
-	r := Router(&videoConnector, &fs)
+	r := Router(&videoRepository, &fs)
 
 	// video list test
 	request, err := http.NewRequest(http.MethodGet, "/api/v1/list", nil)
@@ -29,14 +29,14 @@ func TestRouter(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	expected, _ := json.Marshal(videoConnector.videos)
+	expected, _ := json.Marshal(videoRepository.videos)
 	if recorder.Body.String() != string(expected) {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			recorder.Body.String(), expected)
 	}
 
 	// video details test
-	var videoId = videoConnector.videos[0].Id
+	var videoId = videoRepository.videos[0].Id
 	request, err = http.NewRequest(http.MethodGet, "/api/v1/video/"+videoId, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -50,7 +50,7 @@ func TestRouter(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	expected, _ = json.Marshal(videoConnector.videos[0])
+	expected, _ = json.Marshal(videoRepository.videos[0])
 	if recorder.Body.String() != string(expected) {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			recorder.Body.String(), expected)
@@ -68,7 +68,7 @@ func TestRouter(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	if len(videoConnector.videos) != 4 {
+	if len(videoRepository.videos) != 4 {
 		t.Error("handler should add a new video to the list")
 	}
 
@@ -86,7 +86,7 @@ func TestRouter(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	sstruct := statusStruct{videoConnector.videos[0].Status}
+	sstruct := statusStruct{videoRepository.videos[0].Status}
 	expected, _ = json.Marshal(sstruct)
 	if recorder.Body.String() != string(expected) {
 		t.Errorf("handler returned unexpected body: got %v want %v",

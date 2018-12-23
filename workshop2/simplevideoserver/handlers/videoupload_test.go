@@ -57,7 +57,7 @@ func TestVideoUpload(t *testing.T) {
 	recorder := httptest.NewRecorder()
 	const path = "..\\content\\d290f1ee-6c54-4b01-90e6-d701748f0851\\index.mp4"
 	request, _ := newfileUploadTestRequest("/video", path, "video/mp4")
-	videoRepository := NewMockVideosConnector()
+	videoRepository := NewMockVideoRepository()
 	var fs MockFilesHandler
 	handleVideoUpload(recorder, request, &videoRepository, &fs)
 

@@ -5,13 +5,13 @@ import (
 	"strings"
 )
 
-type MockVideoConnector struct {
+type MockVideoRepository struct {
 	videos        []Video
 	errorToReturn error
 }
 
-func (connector *MockVideoConnector) GetVideoList(search string, start *uint, count *uint) ([]Video, error) {
-	videos := connector.videos
+func (repository *MockVideoRepository) GetVideoList(search string, start *uint, count *uint) ([]Video, error) {
+	videos := repository.videos
 	if len(search) != 0 {
 		filtered := []Video{}
 		for _, v := range videos {
@@ -27,35 +27,35 @@ func (connector *MockVideoConnector) GetVideoList(search string, start *uint, co
 	if count != nil {
 		videos = videos[:*count]
 	}
-	return videos, connector.errorToReturn
+	return videos, repository.errorToReturn
 }
 
-func (connector *MockVideoConnector) GetVideoDetails(videoId string) (Video, error) {
-	for _, v := range connector.videos {
+func (repository *MockVideoRepository) GetVideoDetails(videoId string) (Video, error) {
+	for _, v := range repository.videos {
 		if v.Id == videoId {
-			return v, connector.errorToReturn
+			return v, repository.errorToReturn
 		}
 	}
 	return Video{}, errors.New("Invalid video requested. Id=" + videoId)
 }
 
-func (connector *MockVideoConnector) AddVideo(video Video) error {
-	connector.videos = append(connector.videos, video)
-	return connector.errorToReturn
+func (repository *MockVideoRepository) AddVideo(video Video) error {
+	repository.videos = append(repository.videos, video)
+	return repository.errorToReturn
 }
 
-func (connector *MockVideoConnector) GetVideoStatus(videoId string) (Status, error) {
-	for _, v := range connector.videos {
+func (repository *MockVideoRepository) GetVideoStatus(videoId string) (Status, error) {
+	for _, v := range repository.videos {
 		if v.Id == videoId {
-			return v.Status, connector.errorToReturn
+			return v.Status, repository.errorToReturn
 		}
 	}
 	return Error, errors.New("Invalid video requested. Id=" + videoId)
 }
 
-func NewMockVideosConnector() MockVideoConnector {
-	var connector MockVideoConnector
-	connector.videos = []Video{
+func NewMockVideoRepository() MockVideoRepository {
+	var repository MockVideoRepository
+	repository.videos = []Video{
 		{
 			"d290f1ee-6c54-4b01-90e6-d701748f0851",
 			"Black Retrospetive Woman",
@@ -81,5 +81,5 @@ func NewMockVideosConnector() MockVideoConnector {
 			Ready,
 		},
 	}
-	return connector
+	return repository
 }
