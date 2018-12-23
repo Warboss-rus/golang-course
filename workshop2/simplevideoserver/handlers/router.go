@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func Router(vr VideosRepository, fs FilesHandler) http.Handler {
+func Router(vr VideosRepository, fs FileStorage) http.Handler {
 	WithRepository := func(f func(http.ResponseWriter, *http.Request, VideosRepository)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			f(w, r, vr)

@@ -10,7 +10,7 @@ type FileSystemHandler struct {
 }
 
 func (fs *FileSystemHandler) CreateFile(id string, filename string, content io.Reader) (string, error) {
-	const videoDir = "..\\content"
+	const videoDir = "workshop2\\simplevideoserver\\content"
 	dir := filepath.Join(videoDir, id)
 	file, err := createFile(filename, dir)
 	if err != nil {

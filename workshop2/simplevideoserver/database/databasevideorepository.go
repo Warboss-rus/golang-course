@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	. "github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/handlers"
+	"github.com/Warboss-rus/golang-course/workshop4/videoProcessingDaemon/videoprocessing"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -120,7 +121,7 @@ func (repository *DataBaseVideoRepository) AddVideo(video Video) error {
 	if repository.db == nil {
 		return errors.New("database is not connected")
 	}
-	q := `INSERT INTO video SET video_key = ?, title = ?, duration = ?, url = ?, thumbnail_url  = ?, status = ?`
+	const q = `INSERT INTO video SET video_key = ?, title = ?, duration = ?, url = ?, thumbnail_url  = ?, status = ?`
 	_, err := repository.db.Exec(q, video.Id, video.Name, video.Duration, video.Url, video.Thumbnail, video.Status)
 	return err
 }
@@ -150,5 +151,45 @@ func (repository *DataBaseVideoRepository) ClearVideos() error {
 		return errors.New("database is not connected")
 	}
 	_, err := repository.db.Exec("DROP TABLE IF EXISTS video")
+	return err
+}
+
+func (repository *DataBaseVideoRepository) GetVideosByStatus(status videoprocessing.Status) ([]videoprocessing.Video, error) {
+	if repository.db == nil {
+		return nil, errors.New("database is not connected")
+	}
+	var videos []videoprocessing.Video
+	const query = `SELECT video_key, url FROM video WHERE status = ?`
+	rows, err := repository.db.Query(query, status)
+	if err != nil {
+		return videos, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var video videoprocessing.Video
+		err := rows.Scan(&video.Id, &video.Url)
+		if err != nil {
+			return videos, err
+		}
+		videos = append(videos, video)
+	}
+	return videos, nil
+}
+
+func (repository *DataBaseVideoRepository) UpdateVideoStatus(videoID string, status videoprocessing.Status) error {
+	if repository.db == nil {
+		return errors.New("database is not connected")
+	}
+	const q = `UPDATE video SET status = ? WHERE video_key = ?`
+	_, err := repository.db.Exec(q, status, videoID)
+	return err
+}
+
+func (repository *DataBaseVideoRepository) UpdateVideo(videoID string, duration int, thumbnail string, status videoprocessing.Status) error {
+	if repository.db == nil {
+		return errors.New("database is not connected")
+	}
+	const q = `UPDATE video SET duration = ?, thumbnail_url = ?, status = ? WHERE video_key = ?`
+	_, err := repository.db.Exec(q, duration, thumbnail, status, videoID)
 	return err
 }
