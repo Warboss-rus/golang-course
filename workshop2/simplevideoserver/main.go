@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/database"
 	"github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/handlers"
+	"github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/storage"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
@@ -12,8 +13,8 @@ import (
 )
 
 func startServer(serverUrl string, db *database.DataBaseVideoRepository) *http.Server {
-	var fs handlers.FileSystemHandler
-	router := handlers.Router(db, &fs)
+	fs := storage.NewFileSystemStorage("")
+	router := handlers.Router(db, fs)
 	srv := &http.Server{Addr: serverUrl, Handler: router}
 	go func() {
 		log.Fatal(srv.ListenAndServe())

@@ -15,7 +15,7 @@ func TestHandleVideo(t *testing.T) {
 	recorder := httptest.NewRecorder()
 	request := httptest.NewRequest(http.MethodGet, "/video/"+videoId, nil)
 	request = mux.SetURLVars(request, map[string]string{"ID": videoId})
-	handleVideo(recorder, request, &videoRepository)
+	handleVideoDetails(recorder, request, &videoRepository)
 	response := recorder.Result()
 	if response.StatusCode != http.StatusOK {
 		t.Errorf("Status code is wrong. Have: %d, want: %d.", response.StatusCode, http.StatusOK)
@@ -48,7 +48,7 @@ func TestHandleVideo(t *testing.T) {
 	request = httptest.NewRequest(http.MethodGet, "/video/"+videoId, nil)
 	request = mux.SetURLVars(request, map[string]string{"ID": videoId})
 	recorder = httptest.NewRecorder()
-	handleVideo(recorder, request, &videoRepository)
+	handleVideoDetails(recorder, request, &videoRepository)
 	response = recorder.Result()
 	if response.StatusCode != http.StatusBadRequest {
 		t.Errorf("Status code is wrong. Have: %d, want: %d.", response.StatusCode, http.StatusBadRequest)

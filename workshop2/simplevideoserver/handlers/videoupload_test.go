@@ -19,9 +19,9 @@ type MockFilesHandler struct {
 	fileCreated   bool
 }
 
-func (fs *MockFilesHandler) CreateFile(id string, filename string, content io.Reader) (string, error) {
+func (fs *MockFilesHandler) StoreFile(filename string, content io.Reader) (string, error) {
 	fs.fileCreated = true
-	return filepath.Join("content", id, filename), fs.errorToReturn
+	return filepath.Join("content", filename), fs.errorToReturn
 }
 
 func newfileUploadTestRequest(uri string, path string, contentType string) (*http.Request, error) {

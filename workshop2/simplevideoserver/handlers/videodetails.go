@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func handleVideo(w http.ResponseWriter, r *http.Request, repository VideosRepository) {
+func handleVideoDetails(w http.ResponseWriter, r *http.Request, repository VideosRepository) {
 	vars := mux.Vars(r)
 	id := vars["ID"]
 	video, err := repository.GetVideoDetails(id)

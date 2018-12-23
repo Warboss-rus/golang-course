@@ -15,7 +15,7 @@ func Router(vr VideosRepository, fs FileStorage) http.Handler {
 	r := mux.NewRouter()
 	s := r.PathPrefix("/api/v1").Subrouter()
 	s.HandleFunc("/list", WithRepository(handleList)).Methods(http.MethodGet)
-	s.HandleFunc("/video/{ID}", WithRepository(handleVideo)).Methods(http.MethodGet)
+	s.HandleFunc("/video/{ID}", WithRepository(handleVideoDetails)).Methods(http.MethodGet)
 	s.HandleFunc("/video/{ID}/status", WithRepository(handleStatus)).Methods(http.MethodGet)
 	s.HandleFunc("/video", func(writer http.ResponseWriter, request *http.Request) {
 		handleVideoUpload(writer, request, vr, fs)

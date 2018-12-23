@@ -1,4 +1,4 @@
-package handlers
+package storage
 
 import (
 	"io/ioutil"
@@ -11,15 +11,16 @@ import (
 func TestFileSystemHandler(t *testing.T) {
 	const filename = "test.mp4"
 	const id = "test-id"
-	const videoDir = "..\\content"
-	expectedPath := filepath.Join(videoDir, id, filename)
-	expectedUrl := filepath.Join("content", id, filename)
-	defer os.RemoveAll(filepath.Join(videoDir, id))
+	videoDir, _ := ioutil.TempDir(os.TempDir(), "TestFileSystemHandler")
+	filePath := filepath.Join(id, filename)
+	expectedPath := filepath.Join(videoDir, filePath)
+	expectedUrl := filepath.Join("content", filePath)
+	defer os.RemoveAll(videoDir)
 	const content = "file content"
-	var fs FileSystemHandler
-	url, err := fs.CreateFile(id, filename, strings.NewReader(content))
+	fs := NewFileSystemStorage(videoDir)
+	url, err := fs.StoreFile(filePath, strings.NewReader(content))
 	if err != nil {
-		t.Error("CreateFile failed")
+		t.Error("StoreFile failed")
 	}
 	if url != expectedUrl {
 		t.Errorf("Invalid url received. Expected %s, got %s", expectedUrl, url)

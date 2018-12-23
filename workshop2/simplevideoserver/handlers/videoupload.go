@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"path/filepath"
 )
 
 func handleVideoUpload(w http.ResponseWriter, r *http.Request, repository VideosRepository, fs FileStorage) {
@@ -23,7 +24,7 @@ func handleVideoUpload(w http.ResponseWriter, r *http.Request, repository Videos
 
 	id := uuid.New().String()
 	fileName := header.Filename
-	url, err := fs.CreateFile(id, fileName, fileReader)
+	url, err := fs.StoreFile(filepath.Join(id, fileName), fileReader)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Error(err)
