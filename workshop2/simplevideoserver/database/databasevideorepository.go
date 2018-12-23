@@ -12,14 +12,12 @@ type DataBaseVideoRepository struct {
 	db *sql.DB
 }
 
-func (repository *DataBaseVideoRepository) Connect() error {
+func (repository *DataBaseVideoRepository) Connect(dbname string, user string, password string) error {
 	if repository.db != nil {
 		return errors.New("database is already connected")
 	}
-	const user = "root"
-	const password = "root"
-	const dbname = "db1"
-	const dataSource = user + ":" + password + "@/" + dbname
+
+	dataSource := user + ":" + password + "@/" + dbname
 	db, err := sql.Open("mysql", dataSource)
 	if err != nil {
 		return err
@@ -29,32 +27,11 @@ func (repository *DataBaseVideoRepository) Connect() error {
 	if err := db.Ping(); err != nil {
 		return err
 	}
-	return nil
+	return repository.CreateTableIfNotExists()
 }
 
-func (repository *DataBaseVideoRepository) ConnectTestDatabase() error {
-	if repository.db != nil {
-		return errors.New("database is already connected")
-	}
-	const user = "root"
-	const password = "root"
-	const dbname = "dbtest"
-	const dataSource = user + ":" + password + "@/" + dbname
-	db, err := sql.Open("mysql", dataSource)
-	if err != nil {
-		return err
-	}
-	repository.db = db
-
-	if err := db.Ping(); err != nil {
-		return err
-	}
-
-	_, err = db.Exec("DROP TABLE IF EXISTS video;")
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec(`CREATE TABLE video
+func (repository *DataBaseVideoRepository) CreateTableIfNotExists() error {
+	_, err := repository.db.Exec(`CREATE TABLE IF NOT EXISTS video
 		(
 		    id            INT UNSIGNED UNIQUE NOT NULL AUTO_INCREMENT,
 		    video_key     VARCHAR(255) UNIQUE,
@@ -72,7 +49,7 @@ func (repository *DataBaseVideoRepository) GetVideoList(search string, start *ui
 	if repository.db == nil {
 		return nil, errors.New("database is not connected")
 	}
-	var videos []Video
+	videos := make([]Video, 0)
 	query := `SELECT video_key, title, duration, url, thumbnail_url, status FROM video`
 	var args []interface{}
 	if len(search) > 0 {
@@ -146,7 +123,7 @@ func (repository *DataBaseVideoRepository) Close() error {
 	return nil
 }
 
-func (repository *DataBaseVideoRepository) ClearVideos() error {
+func (repository *DataBaseVideoRepository) RemoveTable() error {
 	if repository.db == nil {
 		return errors.New("database is not connected")
 	}
@@ -158,7 +135,7 @@ func (repository *DataBaseVideoRepository) GetVideosByStatus(status videoprocess
 	if repository.db == nil {
 		return nil, errors.New("database is not connected")
 	}
-	var videos []videoprocessing.Video
+	videos := make([]videoprocessing.Video, 0)
 	const query = `SELECT video_key, url FROM video WHERE status = ?`
 	rows, err := repository.db.Query(query, status)
 	if err != nil {

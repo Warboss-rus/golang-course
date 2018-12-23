@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/database"
 	"github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/handlers"
 	"github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/storage"
@@ -12,9 +13,8 @@ import (
 	"syscall"
 )
 
-func startServer(serverUrl string, db *database.DataBaseVideoRepository) *http.Server {
-	fs := storage.NewFileSystemStorage("")
-	router := handlers.Router(db, fs)
+func startServer(serverUrl string, videosRepository handlers.VideosRepository, fs handlers.FileStorage) *http.Server {
+	router := handlers.Router(videosRepository, fs)
 	srv := &http.Server{Addr: serverUrl, Handler: router}
 	go func() {
 		log.Fatal(srv.ListenAndServe())
@@ -50,14 +50,23 @@ func main() {
 	const serverUrl = ":8000"
 	log.WithFields(log.Fields{"url": serverUrl}).Info("starting the server")
 
+	const defaultContentDir = "workshop2\\simplevideoserver\\content"
+	contentDir := flag.String("-dir", defaultContentDir, "Specify a directory to store the videos")
+	user := flag.String("-user", "root", "Specify a user for database access")
+	password := flag.String("-password", "root", "Specify a password for database access")
+	dbname := flag.String("-database", "db1", "Specify a database name for database access")
+	flag.Parse()
+
 	var db database.DataBaseVideoRepository
-	if err := db.Connect(); err != nil {
+	if err := db.Connect(*dbname, *user, *password); err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
+	fs := storage.NewFileSystemStorage(*contentDir)
+
 	killSignalChan := getKillSignalChan()
-	srv := startServer(serverUrl, &db)
+	srv := startServer(serverUrl, &db, fs)
 
 	waitForKillSignal(killSignalChan)
 	log.Fatal(srv.Shutdown(context.Background()))

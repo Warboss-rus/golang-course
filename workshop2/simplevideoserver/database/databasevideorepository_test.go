@@ -1,6 +1,9 @@
 package database
 
-import "testing"
+import (
+	"github.com/Warboss-rus/golang-course/workshop4/videoProcessingDaemon/videoprocessing"
+	"testing"
+)
 import . "github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/handlers"
 
 func TestDataBaseVideoRepository(t *testing.T) {
@@ -15,10 +18,13 @@ func TestDataBaseVideoRepository(t *testing.T) {
 		t.Error("Database connector should return error if not connected")
 	}
 
-	if err := repository.ConnectTestDatabase(); err == nil {
+	const user = "root"
+	const password = "root"
+	const dbname = "dbtest"
+	if err := repository.Connect(dbname, user, password); err == nil {
 		// test database is available, if its not that's OK too, don't fail the test
 		defer func() {
-			if err := repository.ClearVideos(); err != nil {
+			if err := repository.RemoveTable(); err != nil {
 				t.Error("Cannot clear database")
 			}
 		}()
@@ -96,6 +102,54 @@ func TestDataBaseVideoRepository(t *testing.T) {
 		_, err = repository.GetVideoStatus(invalidId)
 		if _, ok := err.(*VideoNotFound); !ok {
 			t.Error("VideoNotFound error expected")
+		}
+
+		// videos by status test
+		processingVideos, err := repository.GetVideosByStatus(videoprocessing.Created)
+		if err != nil {
+			t.Error("Getting list of videos failed")
+		}
+		if len(processingVideos) != 1 {
+			t.Error("Invalid number of videos received")
+		}
+		if processingVideos[0].Id != mockVideos[0].Id || processingVideos[0].Url != mockVideos[0].Url {
+			t.Error("Invalid video received")
+		}
+
+		// empty result test
+		processingVideos, err = repository.GetVideosByStatus(videoprocessing.Deleted)
+		if err != nil {
+			t.Error("Getting list of videos failed")
+		}
+		if len(processingVideos) != 0 {
+			t.Error("Invalid number of videos received")
+		}
+
+		// update video status test
+		videoID := mockVideos[0].Id
+		err = repository.UpdateVideoStatus(videoID, videoprocessing.Processing)
+		if err != nil {
+			t.Error("Failed to update video status")
+		}
+		status, err := repository.GetVideoStatus(videoID)
+		if err != nil || status != Processing {
+			t.Error("Status was not correctly updated")
+		}
+		processingVideos, err = repository.GetVideosByStatus(videoprocessing.Created)
+		if err != nil || len(processingVideos) != 0 {
+			t.Error("Status was not correctly updated")
+		}
+
+		// update video test
+		const duration = 987
+		const thumbnail = "content\\preview.jpg"
+		err = repository.UpdateVideo(videoID, duration, thumbnail, videoprocessing.Ready)
+		if err != nil {
+			t.Error("Video updating failed")
+		}
+		v, err := repository.GetVideoDetails(videoID)
+		if err != nil || v.Duration != duration || v.Thumbnail != thumbnail || v.Status != Ready {
+			t.Error("Invalid data received after updating")
 		}
 	}
 }
