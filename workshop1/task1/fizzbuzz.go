@@ -4,7 +4,8 @@ import "fmt"
 
 func main() {
 	str := ""
-	for i := 1; i < 100; i++ {
+	const count = 100
+	for i := 1; i <= count; i++ {
 		if i%15 == 0 {
 			str += "Fizz Buzz"
 		} else if i%3 == 0 {
@@ -14,7 +15,9 @@ func main() {
 		} else {
 			str += fmt.Sprint(i)
 		}
-		str += ", "
+		if i != count {
+			str += ", "
+		}
 	}
 	fmt.Println(str)
 }
