@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func WatchVideos(stopChan <-chan struct{}, repository VideoRepository) <-chan Video {
+func WatchVideos(stopChan <-chan struct{}, repository VideoRepository, interval time.Duration) <-chan Video {
 	videosChan := make(chan Video)
 	go func() {
 		for {
@@ -25,7 +25,7 @@ func WatchVideos(stopChan <-chan struct{}, repository VideoRepository) <-chan Vi
 					videosChan <- v
 				}
 			} else {
-				time.Sleep(1 * time.Second)
+				time.Sleep(interval)
 			}
 		}
 	}()

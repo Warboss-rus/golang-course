@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func getKillSignalChan() chan os.Signal {
@@ -51,7 +52,7 @@ func main() {
 	killSignalChan := getKillSignalChan()
 	stopChan := make(chan struct{})
 	processor := ffmpeg.FfmpegVideoProcessor{}
-	videosChan := videoprocessing.WatchVideos(stopChan, &db)
+	videosChan := videoprocessing.WatchVideos(stopChan, &db, 1*time.Second)
 	wg := videoprocessing.RunWorkerPool(videosChan, &db, &processor, *contentDir)
 
 	waitForKillSignal(killSignalChan)
