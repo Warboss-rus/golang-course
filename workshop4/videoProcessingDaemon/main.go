@@ -43,7 +43,7 @@ func main() {
 	dbname := flag.String("-database", "db1", "Specify a database name for database access")
 	flag.Parse()
 
-	var db database.DataBaseVideoRepository
+	var db database.DBVideoRepository
 	if err := db.Connect(*dbname, *user, *password); err != nil {
 		log.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func main() {
 
 	killSignalChan := getKillSignalChan()
 	stopChan := make(chan struct{})
-	processor := ffmpeg.FfmpegVideoProcessor{}
+	processor := ffmpeg.VideoProcessor{}
 	videosChan := videoprocessing.WatchVideos(stopChan, &db, 1*time.Second)
 	wg := videoprocessing.RunWorkerPool(videosChan, &db, &processor, *contentDir)
 

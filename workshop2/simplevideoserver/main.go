@@ -14,9 +14,9 @@ import (
 	"syscall"
 )
 
-func startServer(serverUrl string, videosRepository handlers.VideosRepository, fs handlers.FileStorage) *http.Server {
+func startServer(serverURL string, videosRepository handlers.VideosRepository, fs handlers.FileStorage) *http.Server {
 	router := handlers.Router(videosRepository, fs)
-	srv := &http.Server{Addr: serverUrl, Handler: router}
+	srv := &http.Server{Addr: serverURL, Handler: router}
 	go func() {
 		log.Fatal(srv.ListenAndServe())
 	}()
@@ -48,8 +48,8 @@ func main() {
 		defer file.Close()
 	}
 
-	const serverUrl = ":8000"
-	log.WithFields(log.Fields{"url": serverUrl}).Info("starting the server")
+	const serverURL = ":8000"
+	log.WithFields(log.Fields{"url": serverURL}).Info("starting the server")
 
 	const defaultContentDir = "workshop2\\simplevideoserver\\content"
 	workDir, _ := os.Getwd()
@@ -59,7 +59,7 @@ func main() {
 	dbname := flag.String("-database", "db1", "Specify a database name for database access")
 	flag.Parse()
 
-	var db database.DataBaseVideoRepository
+	var db database.DBVideoRepository
 	if err := db.Connect(*dbname, *user, *password); err != nil {
 		log.Fatal(err)
 	}
@@ -68,7 +68,7 @@ func main() {
 	fs := storage.NewFileSystemStorage(*contentDir)
 
 	killSignalChan := getKillSignalChan()
-	srv := startServer(serverUrl, &db, fs)
+	srv := startServer(serverURL, &db, fs)
 
 	waitForKillSignal(killSignalChan)
 	log.Fatal(srv.Shutdown(context.Background()))

@@ -68,13 +68,13 @@ func TestRunWorker(t *testing.T) {
 
 	// add video to process
 	video := Video{"videoId", "videoUrl"}
-	thumbnail := filepath.Join("content", video.Id, "screen.jpg")
+	thumbnail := filepath.Join("content", video.ID, "screen.jpg")
 	processor.duration = 987
 	videoChan <- video
-	if repository.videoID != video.Id || repository.duration != int(processor.duration) || repository.thumbnail != thumbnail || repository.status != Ready {
+	if repository.videoID != video.ID || repository.duration != int(processor.duration) || repository.thumbnail != thumbnail || repository.status != Ready {
 		t.Error("Repository was not updated correctly")
 	}
-	if processor.thumbnailPath != thumbnail || processor.videoPath != video.Url {
+	if processor.thumbnailPath != thumbnail || processor.videoPath != video.URL {
 		t.Error("Incorrect arguments supplied to videoprocessor")
 	}
 
@@ -84,7 +84,7 @@ func TestRunWorker(t *testing.T) {
 	processor.thumbnailGenerationError = nil
 	videoChan <- video
 	time.Sleep(time.Second)
-	if repository.videoID != video.Id || repository.status != Error {
+	if repository.videoID != video.ID || repository.status != Error {
 		t.Error("Worker did not report an error to repository")
 	}
 
@@ -94,7 +94,7 @@ func TestRunWorker(t *testing.T) {
 	processor.thumbnailGenerationError = errors.New("cannot generate thumbnail")
 	videoChan <- video
 	time.Sleep(time.Second)
-	if repository.videoID != video.Id || repository.status != Error {
+	if repository.videoID != video.ID || repository.status != Error {
 		t.Error("Worker did not report an error to repository")
 	}
 }

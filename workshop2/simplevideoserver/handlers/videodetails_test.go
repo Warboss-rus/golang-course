@@ -11,10 +11,10 @@ import (
 
 func TestHandleVideo(t *testing.T) {
 	videoRepository := NewMockVideoRepository()
-	videoId := videoRepository.videos[0].Id
+	videoID := videoRepository.videos[0].ID
 	recorder := httptest.NewRecorder()
-	request := httptest.NewRequest(http.MethodGet, "/video/"+videoId, nil)
-	request = mux.SetURLVars(request, map[string]string{"ID": videoId})
+	request := httptest.NewRequest(http.MethodGet, "/video/"+videoID, nil)
+	request = mux.SetURLVars(request, map[string]string{"ID": videoID})
 	handleVideoDetails(recorder, request, &videoRepository)
 	response := recorder.Result()
 	if response.StatusCode != http.StatusOK {
@@ -33,10 +33,10 @@ func TestHandleVideo(t *testing.T) {
 	if err = json.Unmarshal(jsonString, &v); err != nil {
 		t.Errorf("Can't parse json response with error %v", err)
 	}
-	if v.Id != videoId {
+	if v.ID != videoID {
 		t.Error("Invalid video received")
 	}
-	video, err := videoRepository.GetVideoDetails(videoId)
+	video, err := videoRepository.GetVideoDetails(videoID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,9 +44,9 @@ func TestHandleVideo(t *testing.T) {
 		t.Error("Invalid video received")
 	}
 
-	videoId = "invalid"
-	request = httptest.NewRequest(http.MethodGet, "/video/"+videoId, nil)
-	request = mux.SetURLVars(request, map[string]string{"ID": videoId})
+	videoID = "invalid"
+	request = httptest.NewRequest(http.MethodGet, "/video/"+videoID, nil)
+	request = mux.SetURLVars(request, map[string]string{"ID": videoID})
 	recorder = httptest.NewRecorder()
 	handleVideoDetails(recorder, request, &videoRepository)
 	response = recorder.Result()

@@ -35,7 +35,7 @@ func TestHandleList(t *testing.T) {
 		t.Error("Invalid number of videos received")
 	}
 	for _, v := range items {
-		video, err := videoRepository.GetVideoDetails(v.Id)
+		video, err := videoRepository.GetVideoDetails(v.ID)
 		if err != nil {
 			t.Fatal(err)
 		}

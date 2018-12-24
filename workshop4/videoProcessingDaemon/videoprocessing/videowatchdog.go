@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// WatchVideos receives unprocessed videos from the database at a specified interval and sends them to be processed
+// Returns the channel that will receive videos to be processed
+// To stop the loop send empty struct to stopChan
 func WatchVideos(stopChan <-chan struct{}, repository VideoRepository, interval time.Duration) <-chan Video {
 	videosChan := make(chan Video)
 	go func() {
@@ -21,7 +24,7 @@ func WatchVideos(stopChan <-chan struct{}, repository VideoRepository, interval 
 			}
 			if len(videos) != 0 && err == nil {
 				for _, v := range videos {
-					log.Printf("Got the video to process %s\n", v.Id)
+					log.Printf("Got the video to process %s\n", v.ID)
 					videosChan <- v
 				}
 			} else {

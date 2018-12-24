@@ -11,10 +11,10 @@ import (
 
 func TestStatusHandler(t *testing.T) {
 	videoRepository := NewMockVideoRepository()
-	videoId := videoRepository.videos[0].Id
+	videoID := videoRepository.videos[0].ID
 	recorder := httptest.NewRecorder()
-	request := httptest.NewRequest(http.MethodGet, "/video/"+videoId+"/status", nil)
-	request = mux.SetURLVars(request, map[string]string{"ID": videoId})
+	request := httptest.NewRequest(http.MethodGet, "/video/"+videoID+"/status", nil)
+	request = mux.SetURLVars(request, map[string]string{"ID": videoID})
 	handleStatus(recorder, request, &videoRepository)
 	response := recorder.Result()
 	if response.StatusCode != http.StatusOK {
@@ -37,9 +37,9 @@ func TestStatusHandler(t *testing.T) {
 		t.Error("Invalid status received")
 	}
 
-	videoId = "invalid"
-	request = httptest.NewRequest(http.MethodGet, "/video/"+videoId+"/status", nil)
-	request = mux.SetURLVars(request, map[string]string{"ID": videoId})
+	videoID = "invalid"
+	request = httptest.NewRequest(http.MethodGet, "/video/"+videoID+"/status", nil)
+	request = mux.SetURLVars(request, map[string]string{"ID": videoID})
 	recorder = httptest.NewRecorder()
 	handleStatus(recorder, request, &videoRepository)
 	response = recorder.Result()

@@ -7,7 +7,7 @@ import (
 import . "github.com/Warboss-rus/golang-course/workshop2/simplevideoserver/handlers"
 
 func TestDataBaseVideoRepository(t *testing.T) {
-	var repository DataBaseVideoRepository
+	var repository DBVideoRepository
 	defer func() {
 		if err := repository.Close(); err != nil {
 			t.Error("Cannot close database")
@@ -24,7 +24,7 @@ func TestDataBaseVideoRepository(t *testing.T) {
 	if err := repository.Connect(dbname, user, password); err == nil {
 		// test database is available, if its not that's OK too, don't fail the test
 		defer func() {
-			if err := repository.RemoveTable(); err != nil {
+			if err := repository.removeTable(); err != nil {
 				t.Error("Cannot clear database")
 			}
 		}()
@@ -46,21 +46,21 @@ func TestDataBaseVideoRepository(t *testing.T) {
 			t.Error("Invalid number of videos received")
 		}
 		for _, v := range videos {
-			video, err := mockVideoRepository.GetVideoDetails(v.Id)
+			video, err := mockVideoRepository.GetVideoDetails(v.ID)
 			if err != nil || video != v {
 				t.Error("Invalid video received")
 			}
 		}
 
 		for _, v := range mockVideos {
-			video, err := repository.GetVideoDetails(v.Id)
+			video, err := repository.GetVideoDetails(v.ID)
 			if err != nil || video != v {
 				t.Error("Invalid video received")
 			}
 		}
 
 		for _, v := range mockVideos {
-			status, err := repository.GetVideoStatus(v.Id)
+			status, err := repository.GetVideoStatus(v.ID)
 			if err != nil || status != v.Status {
 				t.Error("Invalid status received")
 			}
@@ -93,13 +93,13 @@ func TestDataBaseVideoRepository(t *testing.T) {
 		}
 
 		// invalid id test
-		var invalidId = "invalid"
-		_, err = repository.GetVideoDetails(invalidId)
+		var invalidID = "invalid"
+		_, err = repository.GetVideoDetails(invalidID)
 		if _, ok := err.(*VideoNotFound); !ok {
 			t.Error("VideoNotFound error expected")
 		}
 
-		_, err = repository.GetVideoStatus(invalidId)
+		_, err = repository.GetVideoStatus(invalidID)
 		if _, ok := err.(*VideoNotFound); !ok {
 			t.Error("VideoNotFound error expected")
 		}
@@ -112,7 +112,7 @@ func TestDataBaseVideoRepository(t *testing.T) {
 		if len(processingVideos) != 1 {
 			t.Error("Invalid number of videos received")
 		}
-		if processingVideos[0].Id != mockVideos[0].Id || processingVideos[0].Url != mockVideos[0].Url {
+		if processingVideos[0].ID != mockVideos[0].ID || processingVideos[0].URL != mockVideos[0].URL {
 			t.Error("Invalid video received")
 		}
 
@@ -126,7 +126,7 @@ func TestDataBaseVideoRepository(t *testing.T) {
 		}
 
 		// update video status test
-		videoID := mockVideos[0].Id
+		videoID := mockVideos[0].ID
 		err = repository.UpdateVideoStatus(videoID, videoprocessing.Processing)
 		if err != nil {
 			t.Error("Failed to update video status")

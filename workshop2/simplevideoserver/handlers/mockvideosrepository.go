@@ -5,15 +5,17 @@ import (
 	"strings"
 )
 
+// MockVideoRepository is an in-memory implementation of VideosRepository interface
 type MockVideoRepository struct {
 	videos        []Video
 	errorToReturn error
 }
 
+// GetVideoList returns a list of videos satisfying the criteria
 func (repository *MockVideoRepository) GetVideoList(search string, start *uint, count *uint) ([]Video, error) {
 	videos := repository.videos
 	if len(search) != 0 {
-		filtered := []Video{}
+		filtered := make([]Video, 0)
 		for _, v := range videos {
 			if strings.Contains(v.Name, search) {
 				filtered = append(filtered, v)
@@ -30,29 +32,33 @@ func (repository *MockVideoRepository) GetVideoList(search string, start *uint, 
 	return videos, repository.errorToReturn
 }
 
-func (repository *MockVideoRepository) GetVideoDetails(videoId string) (Video, error) {
+// GetVideoDetails returns the details of single video
+func (repository *MockVideoRepository) GetVideoDetails(videoID string) (Video, error) {
 	for _, v := range repository.videos {
-		if v.Id == videoId {
+		if v.ID == videoID {
 			return v, repository.errorToReturn
 		}
 	}
-	return Video{}, errors.New("Invalid video requested. Id=" + videoId)
+	return Video{}, errors.New("Invalid video requested. ID=" + videoID)
 }
 
+// AddVideo adds a new video to the list
 func (repository *MockVideoRepository) AddVideo(video Video) error {
 	repository.videos = append(repository.videos, video)
 	return repository.errorToReturn
 }
 
-func (repository *MockVideoRepository) GetVideoStatus(videoId string) (Status, error) {
+// GetVideoStatus returns the status of the video
+func (repository *MockVideoRepository) GetVideoStatus(videoID string) (Status, error) {
 	for _, v := range repository.videos {
-		if v.Id == videoId {
+		if v.ID == videoID {
 			return v.Status, repository.errorToReturn
 		}
 	}
-	return Error, errors.New("Invalid video requested. Id=" + videoId)
+	return Error, errors.New("Invalid video requested. ID=" + videoID)
 }
 
+// NewMockVideoRepository creates a new MockVideoRepository and fills it with initial data
 func NewMockVideoRepository() MockVideoRepository {
 	var repository MockVideoRepository
 	repository.videos = []Video{

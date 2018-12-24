@@ -36,8 +36,8 @@ func TestRouter(t *testing.T) {
 	}
 
 	// video details test
-	var videoId = videoRepository.videos[0].Id
-	request, err = http.NewRequest(http.MethodGet, "/api/v1/video/"+videoId, nil)
+	var videoID = videoRepository.videos[0].ID
+	request, err = http.NewRequest(http.MethodGet, "/api/v1/video/"+videoID, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func TestRouter(t *testing.T) {
 	}
 
 	// video status test
-	request, err = http.NewRequest(http.MethodGet, "/api/v1/video/"+videoId+"/status", nil)
+	request, err = http.NewRequest(http.MethodGet, "/api/v1/video/"+videoID+"/status", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// Router redirects the requests to their respective handlers
 func Router(vr VideosRepository, fs FileStorage) http.Handler {
 	WithRepository := func(f func(http.ResponseWriter, *http.Request, VideosRepository)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -20,5 +21,5 @@ func Router(vr VideosRepository, fs FileStorage) http.Handler {
 	s.HandleFunc("/video", func(writer http.ResponseWriter, request *http.Request) {
 		handleVideoUpload(writer, request, vr, fs)
 	}).Methods(http.MethodPost)
-	return logHttpHandler(r)
+	return logHTTPHandler(r)
 }

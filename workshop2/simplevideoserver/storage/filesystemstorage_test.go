@@ -14,7 +14,7 @@ func TestFileSystemHandler(t *testing.T) {
 	videoDir, _ := ioutil.TempDir(os.TempDir(), "TestFileSystemHandler")
 	filePath := filepath.Join(id, filename)
 	expectedPath := filepath.Join(videoDir, filePath)
-	expectedUrl := filepath.Join("content", filePath)
+	expectedURL := filepath.Join("content", filePath)
 	defer os.RemoveAll(videoDir)
 	const content = "file content"
 	fs := NewFileSystemStorage(videoDir)
@@ -22,8 +22,8 @@ func TestFileSystemHandler(t *testing.T) {
 	if err != nil {
 		t.Error("StoreFile failed")
 	}
-	if url != expectedUrl {
-		t.Errorf("Invalid url received. Expected %s, got %s", expectedUrl, url)
+	if url != expectedURL {
+		t.Errorf("Invalid url received. Expected %s, got %s", expectedURL, url)
 	}
 	if _, err := os.Stat(expectedPath); os.IsNotExist(err) {
 		t.Error("File does not exists")
